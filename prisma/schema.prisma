@@ -1,20 +1,62 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["pms"]
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model guesty_airbnb_link {
+  guesty_id         String    @db.VarChar(50)
+  airbnb_listing_id String    @unique(map: "idx_airbnb_listing_id") @db.VarChar(50)
+  date_created      DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
 
-    @@index([name])
+  @@schema("pms")
+}
+
+model listing_mapping {
+  guesty_id         String    @id @db.VarChar(50)
+  airbnb_listing_id String?   @db.VarChar(50)
+  active            Boolean?  @default(true)
+  date_created      DateTime? @default(now()) @db.Timestamp(6)
+  last_updated      DateTime? @default(now()) @db.Timestamp(6)
+  nickname          String?   @db.VarChar(50)
+  address           String?
+  tags              String?
+  bedrooms_count    Int?
+  resort            String?   @db.VarChar(255)
+  nightly_rate      Decimal?  @db.Decimal(10, 2)
+  bathrooms_count   Int?
+  currency          String?   @db.VarChar(50)
+  title             String?
+  person_capacity   Int?
+  property_type     String?   @db.VarChar(50)
+  room_type         String?   @db.VarChar(50)
+
+  @@schema("pms")
+}
+
+
+model reservation {
+  reservation_id          String    @id @db.VarChar(255)
+  guesty_listing_id       String    @db.VarChar(255)
+  guest_name              String?   @db.VarChar(255)
+  guest_email             String?   @db.VarChar(255)
+  guest_phone             String?   @db.VarChar(255)
+  check_in_date           DateTime? @db.Date
+  check_out_date          DateTime? @db.Date
+  status                  String?   @db.VarChar(50)
+  date_created            DateTime? @default(now()) @db.Timestamp(6)
+  last_modified           DateTime? @db.Timestamp(6)
+  last_updated            DateTime? @default(now()) @db.Timestamp(6)
+  guest_id                String?   @db.VarChar(50)
+  listing_id              String?   @db.VarChar(50)
+  platform                String?   @db.VarChar(50)
+  external_reservation_id String?   @db.VarChar(150)
+  external_listing_id     String?   @db.VarChar(50)
+
+  @@schema("pms")
 }
